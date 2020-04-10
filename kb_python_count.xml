@@ -1,0 +1,97 @@
+<tool id="salmon_alevin" name="Salmon Alevin" version="0.1.0">
+	<description> enables gene quantification for single-cell RNA-seq using quasi mapping.</description>
+	<requirements>
+		<requirement type="package" version="0.13.1">salmon</requirement>
+		<requirement type="package" version="3.4.1">r-base</requirement>
+		<requirement type="package" version="1.2_14">r-matrix</requirement>
+	 	<requirement type="package" version="1.10.4">r-data.table</requirement>
+	</requirements>
+
+	<stdio>
+		<exit_code range="1:" />
+		<exit_code range=":-1" />
+		<regex match="Error:" />
+		<regex match="Exception:" />
+		<regex match="Exception :" />
+	</stdio>
+
+	<command><![CDATA[
+	## Create output directory for salmon alevin
+	mkdir ./alevin_output 
+	&&
+	ln -s $input_fastq1 ./mate1.fastq
+	&&
+	ln -s $input_fastq2 ./mate2.fastq
+	&&
+	salmon alevin --no-version-check
+		-l ISR
+		-1 ./mate1.fastq
+		-2 ./mate2.fastq
+		--$sc_datatype
+		--dumpCsvCounts
+		-i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/$ref_transcriptome
+		#if $ref_transcriptome == 'v29_index':
+			--tgMap /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/v29_txp2gene.tsv
+		#else:
+			--tgMap /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/vM20_txp2gene.tsv
+		#end if 
+		-p 4
+		-o ./alevin_output
+	&&
+	Rscript '$__tool_directory__/convert_to_matrixRDS.R'
+	]]>
+	</command>
+
+	<inputs>
+		<param type="data" name="input_fastq1" label="Read 1 file for scRNA-seq dataset. (.fastq/.fastq.gz)" format="fastq" />
+		<param type="data" name="input_fastq2" label="Read 2 file for scRNA-seq dataset. (.fastq/.fastq.gz)"  format="fastq" />
+	
+		<param name="ref_transcriptome" label="Select the reference transcriptome of your choice:" type="select" multiple="false" format="text" help="Choose a reference transcriptome!">
+			<option value="v29_index">Homo sapiens (Gencode v29)</option>
+			<option value="vM20_index">Mus musculus (Gencode vM20)</option>
+		</param> 
+
+		<param name="sc_datatype" label="Select your scRNA-seq datatype:" type="select" multiple="false" format="text" help="Choose the single-cell platform used to create your data!">
+			<option value ="chromium">10x Genomics 3'RNA-seq v2</option>
+			<option value ="chromiumV3">10x Genomics 3'RNA-seq v3</option>
+			<option value ="dropseq">Drop-seq</option>
+		</param>
+
+	</inputs>
+	<outputs>
+               <data name="alevin_rds" label="Alevin matrix in Rds format" format="rdata" from_work_dir="salmon_alevin_matrix.RDS" />
+	</outputs>
+	<tests>
+		<test>
+		<param name="input_fastq1" value="test_salmon_alevin.R1.fastq"/>
+		<param name="input_fastq2" value="test_salmon_alevin.R2.fastq"/>
+		<param name="ref_transcriptome" value="vM20_index"/>
+		<param name="sc_datatype" value="dropseq"/>
+		<output name="alevin_rds" file="salmon_alevin_matrix.RDS"/>
+		</test>
+	</tests>
+
+
+	<help><![CDATA[
+Salmon Alevin - Galaxy implementation
+========================================= 
+This is a simple Galaxy tool for the popular scRNA-seq quantification tool Salmon alevin (https://salmon.readthedocs.io/en/latest/alevin.html). This tool takes paired-end .fastq or .fastq.gz files as input and uses salmon alevin to quantify the scRNA-seq data against a reference transcriptome of interest. 
+Currently supported references:
+	* Human (Gencode v29)
+	* Mouse (Gencode vM20)
+Current supported sinlge-cell technologies:
+	* 10x Genomics 3'scRNA-seq v2
+	* 10x Genomics 3'scRNA-seq v3
+	* Drop-seq
+This tool only represents a wrapper for salmon alevin for Galaxy and does not add any additional functionalities. If you would like additional features to be added to salmon alevin, please contact the tool authors directly!
+Disclaimer: This implementation of Salmon Alevin for galaxy has taken many inspirations from the salmon galaxy wrapper (https://github.com/bgruening/galaxytools/tree/master/tools/salmon) by Bjoern Gruening and additional contributors.
+Contact
+======================
+If you like this galaxy tool and want to add or recommend features to implement, please create a pull request at the github repository:
+https://github.com/FloWuenne/salmon_alevin
+or send a quick mail describing your aim to flowuenne@gmail.com!
+    ]]></help>
+	<citations>
+		<citation type="doi">10.1101/021592</citation>	
+	</citations>
+</tool>
