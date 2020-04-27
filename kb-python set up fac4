@@ -1,0 +1,9 @@
+conda create  --prefix /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/envs/__kb-python@0.24.4
+
+conda install -c anaconda pip
+
+pip install kb-python==0.24.4
+
+
+# References
+/cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs
