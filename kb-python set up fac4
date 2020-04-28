@@ -1,9 +1,24 @@
+##Start galaxy container on fac04 then activate conda env
+
+cd /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/
+
+source bin/activate
+
+##Create kb python envi
+
 conda create  --prefix /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/envs/__kb-python@0.24.4
+
+conda activate /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/envs/__kb-python@0.24.4
+
+#install pip and kb-python
 
 conda install -c anaconda pip
 
-pip install kb-python==0.24.4
+python3 -m pip install kb-python==0.24.4
 
 
-# References
-/cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs
+# Create Index References in to =
+
+cd /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index
+
+
