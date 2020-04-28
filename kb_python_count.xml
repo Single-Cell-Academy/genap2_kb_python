@@ -13,30 +13,7 @@
 	</stdio>
 
 	<command><![CDATA[
-	## Create output directory for salmon alevin
-	mkdir ./alevin_output 
-	&&
-	ln -s $input_fastq1 ./mate1.fastq
-	&&
-	ln -s $input_fastq2 ./mate2.fastq
-	&&
-	salmon alevin --no-version-check
-		-l ISR
-		-1 ./mate1.fastq
-		-2 ./mate2.fastq
-		--$sc_datatype
-		--dumpCsvCounts
-		-i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/$ref_transcriptome
-		#if $ref_transcriptome == 'v29_index':
-			--tgMap /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/v29_txp2gene.tsv
-		#else:
-			--tgMap /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/vM20_txp2gene.tsv
-		#end if 
-		-p 4
-		-o ./alevin_output
-	&&
-	Rscript '$__tool_directory__/convert_to_matrixRDS.R'
-	]]>
+	KB
 	</command>
 
 	<inputs>
