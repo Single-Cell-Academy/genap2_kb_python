@@ -1,7 +1,7 @@
 <tool id="kb-python" name="kb-python" version="0.24.4">
 	<description> enables gene quantification for single-cell RNA-seq using quasi mapping.</description>
 	<requirements>
-		<requirement type="package" version="0.24.4">salmon</requirement>
+		<requirement type="package" version="0.24.4">kb-python</requirement>
 	</requirements>
 
 	<stdio>
