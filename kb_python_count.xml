@@ -1,10 +1,7 @@
-<tool id="salmon_alevin" name="Salmon Alevin" version="0.1.0">
+<tool id="kb-python" name="kb-python" version="0.24.4">
 	<description> enables gene quantification for single-cell RNA-seq using quasi mapping.</description>
 	<requirements>
-		<requirement type="package" version="0.13.1">salmon</requirement>
-		<requirement type="package" version="3.4.1">r-base</requirement>
-		<requirement type="package" version="1.2_14">r-matrix</requirement>
-	 	<requirement type="package" version="1.10.4">r-data.table</requirement>
+		<requirement type="package" version="0.24.4">salmon</requirement>
 	</requirements>
 
 	<stdio>
