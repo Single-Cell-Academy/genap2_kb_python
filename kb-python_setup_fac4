@@ -27,4 +27,13 @@ kb ref -d mouse -i index.idx -g t2g.txt
 #This is the normal way of building an index
 #kb ref -i transcriptome.idx -g transcripts_to_genes.txt -f1 cdna.fa
 
+##RUn kb count on test dataset from tutorial https://github.com/pachterlab/kallistobustools/blob/master/notebooks/kb_intro_2_python.ipynb
+
+curl https://caltech.box.com/shared/static/w9ww8et5o029s2e3usjzpbq8lpot29rh.gz --output SRR8599150_S1_L001_R1_001.fastq.gz
+curl https://caltech.box.com/shared/static/ql00zyvqnpy7bf8ogdoe9zfy907guzy9.gz --output SRR8599150_S1_L001_R2_001.fastq.gz
+
+
+
+
+
 
