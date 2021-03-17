@@ -11,22 +11,23 @@
             <citation type="doi">add citation</citation>
         </citations>
     </xml>
-    <xml name="reference_input">
-        <conditional name="reference_transcriptome">
-            <param name="reference_transcriptome_source" type="select" label="Reference transcriptome for quantification">
-                <option value="indexed" selected="true">Use a built-in transcriptome</option>
-                <option value="history">Use a transcriptome from history</option>
+    <xml name="index">
+        <conditional name="refTranscriptSource">
+            <param name="TranscriptSource" type="select" label="Select a reference transcriptome from your history or use a built-in index?"
+                help="Pre-built-indices were downloaded on March 17th 2021">
+                <option value="indexed">Use a built-in index</option>
+                <option value="history" selected="True">Use one from the history</option>
             </param>
             <when value="indexed">
-                <param name="index" type="select" label="Select a reference transcriptome" help="If your transcriptome of interest is not listed, contact your Galaxy administrator">
-                    <options from_data_table="kb_indexes">
-                        <filter type="sort_by" column="2" />
-                        <validator type="no_options" message="No transcriptomes are available for the selected input dataset" />
-                    </options>
+                <param name="index" type="select" label="Select a reference index" help="If your species of interest is not listed, contact your Galaxy admin">
+                    <options from_data_table="kallisto_indexes_versioned" />
                 </param>
-            </when>
+            </when>  <!-- build-in -->
             <when value="history">
-                <param name="reference" type="data" format="fasta" label="FASTA reference transcriptome" />
+                <section name="s_index" title="Kallisto index" expanded="true">
+                    <param name="genomic_fasta" type="data" format="fasta" label="Genomic fasta file"/>
+                    <param name="genomic_gtf" type="data" format="gtf" label="Genomic gtf file"/>
+                </section>
             </when>
         </conditional>
     </xml>

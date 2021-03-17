@@ -2,7 +2,7 @@
 	<description> The kb count command runs the kallisto and bustools programs. It can be used for pre-processing of data from a variety of single-cell RNA-seq technologies, and for a number of different workflows (e.g. production of gene count matrices, RNA velocity analyses, etc.).</description>
 	<macros>
         	<import>macros.xml</import>
-    	</macros>
+    </macros>
 	<requirements>
 		<requirement type="package" version="0.25.1">kb-python</requirement>
 	</requirements>
@@ -13,17 +13,24 @@
 		<regex match="Exception:" />
 		<regex match="Exception :" />
 	</stdio>
-	<command detect_errors="exit_code">
-		<![CDATA[
-		mkdir ./kb_outs
-		&&
-		kb count -i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/index.idx -g /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/t2g.txt -x $TECHNOLOGY -o ./kb_outs --h5ad --cellranger $FASTQ1 $FASTQ2
+	<command detect_errors="exit_code"><![CDATA[
+		mkdir ./index
+		&& mkdir ./kb_outs
+		#if $refTranscriptSource.TranscriptSource != "indexed":
+            && kb ref -i /index/transcriptome.idx 
+			-g ./index/transcripts_to_genes.txt 
+			-f1 ./index/cdna.fa	
+			'${refTranscriptSource.s_index.genomic_fasta}'
+			'${refTranscriptSource.s_index.genomic_gtf}'
+            #set $index_path = './index'
+        #else
+            #set $index_path = $refTranscriptSource.index.fields.path
+        #end if
+		&& kb count -i $index_path/transcriptome.idx  -g $index_path/t2g.txt -x $TECHNOLOGY -o ./kb_outs --h5ad --cellranger $FASTQ1 $FASTQ2
 		]]>
 	</command>
 	<inputs>
-		<!-- <expand macro="reference_input" />
-		<param type="data" name="INDEX" label="Kallisto index" format="idx" multiple="false"/>
-		<param type="data" name="T2G" label="Transcript-to-gene mapping"  format="txt" multiple="false" /> -->
+		<expand macro="index"/> ## index macro copied from alevin wrapper by bgruening : https://github.com/bgruening/galaxytools/blob/master/tools/salmon/macros.xml
 		<param name="TECHNOLOGY" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
 			<option value="10XV1">10XV1</option>
 			<option value="10XV2">10XV2</option>
