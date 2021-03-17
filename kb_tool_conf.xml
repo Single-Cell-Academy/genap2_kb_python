@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <toolbox monitor="true">
-  <section name="scRNA-seq: kb-python v0.24.4" id="kb-python">
-    <tool file="single_cell_tools/kb_python/kb_count.xml"/>
+  <section name="scRNA-seq: kb-python v0.25.1" id="kb-python">
+    <tool file="kb_count.xml"/>
   </section>
 </toolbox>

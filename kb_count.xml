@@ -1,10 +1,10 @@
-<tool id="kb-python" name="kb-python" version="0.24.4">
+<tool id="kb-python" name="kb-python" version="0.25.1">
 	<description> The kb count command runs the kallisto and bustools programs. It can be used for pre-processing of data from a variety of single-cell RNA-seq technologies, and for a number of different workflows (e.g. production of gene count matrices, RNA velocity analyses, etc.).</description>
 	<macros>
         	<import>macros.xml</import>
     	</macros>
 	<requirements>
-		<requirement type="package" version="0.24.4">kb-python</requirement>
+		<requirement type="package" version="0.25.1">kb-python</requirement>
 	</requirements>
 	<stdio>
 		<exit_code range="1:" />
@@ -15,23 +15,14 @@
 	</stdio>
 	<command detect_errors="exit_code">
 		<![CDATA[
-        	#if $reference_transcriptome.reference_transcriptome_source == "history":
-            		ln -s '$reference_transcriptome.reference' reference.fa &&
-            		kallisto index reference.fa -i reference.kallisto &&
-            		#set index_path = 'reference.kallisto'
-        	#else:
-            		#set index_path = $reference_transcriptome.index.fields.path
-        	#end if
 		mkdir ./kb_outs
 		&&
-		kb count -i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/index.idx -g /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/t2g.txt -x $TECHNOLOGY -o ./kb_outs --loom $FASTQ1 $FASTQ2
-		&& 
-		python '$__tool_directory__/kb_helper.py' 	
+		kb count -i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/index.idx -g /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/t2g.txt -x $TECHNOLOGY -o ./kb_outs --h5ad --cellranger $FASTQ1 $FASTQ2
 		]]>
 	</command>
 	<inputs>
-		<expand macro="reference_input" />
-		<!-- <param type="data" name="INDEX" label="Kallisto index" format="idx" multiple="false"/>
+		<!-- <expand macro="reference_input" />
+		<param type="data" name="INDEX" label="Kallisto index" format="idx" multiple="false"/>
 		<param type="data" name="T2G" label="Transcript-to-gene mapping"  format="txt" multiple="false" /> -->
 		<param name="TECHNOLOGY" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
 			<option value="10XV1">10XV1</option>
@@ -51,7 +42,12 @@
 	</inputs>
         <outputs>
 		<data name="h5ad" label="kb-python h5ad file" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata.h5ad"/>
+		<data name="h5ad_genenames" label="kb-python h5ad file filtered for unique gene names" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata_genenames.h5ad"/>
+		<data name="barcodes" label="cellranger barcodes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/barcodes.tsv"/>
+		<data name="genes" label="cellranger genes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/genes.tsv"/>
+		<data name="matrix" label="cellranger matrix" format="txt" from_work_dir="./kb_outs/counts_unfiltered/cellranger/matrix.mtx" />
 		<data name="inspect" label="inspect_report" format="json" from_work_dir="./kb_outs/inspect.json"/>
-		<data name="info" label="run info" format="json" from_work_dir="./kb_outs/run_info.json"/>
+		<data name="runinfo" label="run info" format="json" from_work_dir="./kb_outs/run_info.json"/>
+		<data name="kbinfo" label="kb info" format="json" form_work_dir="./kb_outs/kb_info.json"/>
         </outputs>
 </tool>

@@ -1,0 +1,5 @@
+source /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/bin/activate
+conda create --prefix /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/envs/__kb-python@0.25.1
+conda activate /cvmfs/soft.galaxy/v2.1/tool-dependency/_conda/envs/__kb-python@0.25.1
+conda install -c anaconda pip
+pip install kb-python==0.25.1
