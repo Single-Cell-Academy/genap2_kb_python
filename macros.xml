@@ -20,7 +20,7 @@
             </param>
             <when value="indexed">
                 <param name="index" type="select" label="Select a reference index" help="If your species of interest is not listed, contact your Galaxy admin">
-                    <options from_data_table="kallisto_indexes_versioned" />
+                    <options from_data_table="kallisto_indexes_versioned"/>
                 </param>
             </when>  <!-- build-in -->
             <when value="history">

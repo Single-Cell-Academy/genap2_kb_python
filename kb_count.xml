@@ -30,7 +30,7 @@
 		]]>
 	</command>
 	<inputs>
-		<expand macro="index"/> ## index macro copied from alevin wrapper by bgruening : https://github.com/bgruening/galaxytools/blob/master/tools/salmon/macros.xml
+		<expand macro="index"/>
 		<param name="TECHNOLOGY" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
 			<option value="10XV1">10XV1</option>
 			<option value="10XV2">10XV2</option>
@@ -47,7 +47,7 @@
 		<param name="FASTQ1" label="Select the R1 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>
 		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>  
 	</inputs>
-        <outputs>
+    <outputs>
 		<data name="h5ad" label="kb-python h5ad file" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata.h5ad"/>
 		<data name="h5ad_genenames" label="kb-python h5ad file filtered for unique gene names" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata_genenames.h5ad"/>
 		<data name="barcodes" label="cellranger barcodes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/barcodes.tsv"/>
@@ -56,5 +56,5 @@
 		<data name="inspect" label="inspect_report" format="json" from_work_dir="./kb_outs/inspect.json"/>
 		<data name="runinfo" label="run info" format="json" from_work_dir="./kb_outs/run_info.json"/>
 		<data name="kbinfo" label="kb info" format="json" form_work_dir="./kb_outs/kb_info.json"/>
-        </outputs>
+    </outputs>
 </tool>
