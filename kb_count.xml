@@ -17,8 +17,8 @@
 		mkdir ./index
 		&& mkdir ./kb_outs
 		#if $refTranscriptSource.TranscriptSource != "indexed":
-            && kb ref -i /index/transcriptome.idx 
-			-g ./index/transcripts_to_genes.txt 
+            && kb ref -i ./index/transcriptome.idx 
+			-g ./index/transcripts_to_genes.txt
 			-f1 ./index/cdna.fa	
 			'${refTranscriptSource.s_index.genomic_fasta}'
 			'${refTranscriptSource.s_index.genomic_gtf}'
