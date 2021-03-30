@@ -18,7 +18,7 @@
 		&& mkdir ./kb_outs
 		#if $refTranscriptSource.TranscriptSource != "indexed":
             && kb ref -i ./index/transcriptome.idx 
-			-g ./index/transcripts_to_genes.txt
+			-g ./index/t2g.txt
 			-f1 ./index/cdna.fa	
 			'${refTranscriptSource.s_index.genomic_fasta}'
 			'${refTranscriptSource.s_index.genomic_gtf}'
@@ -26,7 +26,7 @@
         #else
             #set $index_path = $refTranscriptSource.index.fields.path
         #end if
-		&& kb count -i $index_path/transcriptome.idx  -g $index_path/t2g.txt -x $TECHNOLOGY -o ./kb_outs --h5ad --cellranger $FASTQ1 $FASTQ2
+		&& kb count -i $index_path/transcriptome.idx  -g $index_path/t2g.txt -x $TECHNOLOGY -o ./kb_outs --cellranger $FASTQ1 $FASTQ2
 		]]>
 	</command>
 	<inputs>
@@ -48,8 +48,6 @@
 		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>  
 	</inputs>
     <outputs>
-		<data name="h5ad" label="kb-python h5ad file" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata.h5ad"/>
-		<data name="h5ad_genenames" label="kb-python h5ad file filtered for unique gene names" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata_genenames.h5ad"/>
 		<data name="barcodes" label="cellranger barcodes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/barcodes.tsv"/>
 		<data name="genes" label="cellranger genes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/genes.tsv"/>
 		<data name="matrix" label="cellranger matrix" format="txt" from_work_dir="./kb_outs/counts_unfiltered/cellranger/matrix.mtx" />
