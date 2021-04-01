@@ -27,6 +27,8 @@
                 <section name="s_index" title="Kallisto index" expanded="true">
                     <param name="genomic_fasta" type="data" format="fasta" label="Genomic fasta file"/>
                     <param name="genomic_gtf" type="data" format="gtf" label="Genomic gtf file"/>
+                    <param name="reuse_index" type="boolean" label="Do you want to keep the index in your history for reuse?" truevalue="Yes" falsevalue="No" checked="false" help="If not selected, the index created by kb will not
+                    be retrieved by galaxy and you willhave to recompute it next time!"/>
                 </section>
             </when>
         </conditional>
