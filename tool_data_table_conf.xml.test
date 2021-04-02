@@ -1,0 +1,7 @@
+<tables>
+    <!-- Location of kb index file and other files -->
+    <table name="kallisto_indexes_versioned" comment_char="#">
+        <columns>value, dbkey, name, path</columns>
+        <file path="${__HERE__}/tool-data/kallisto_indexes_versioned.loc"/>
+    </table>
+</tables>

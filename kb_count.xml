@@ -16,43 +16,37 @@
 	<command detect_errors="exit_code"><![CDATA[
 		mkdir ./index
 		&& mkdir ./kb_outs
-		#if $refTranscriptSource.TranscriptSource != "indexed":
-			&& kb ref -i ./index/kb_ref.idx
-				-g ./index/t2g.txt
-				-f1 ./index/cdna.fa	
-				#if $workflow == "lamanno":
-					-f2 ./index/intron.fa
-					-c1 ./index/cdna_t2c.txt
-					-c2 ./index/intron_t2c.txt
-					--workflow $workflow
-				#end if
-				'${refTranscriptSource.s_index.genomic_fasta}'
-				'${refTranscriptSource.s_index.genomic_gtf}'
-				#set $index_path = './index'
-        #else
+		#if $refTranscriptSource.TranscriptSource == "history":
+			&& ln -s '${refTranscriptSource.h_index.index_file}' './index/kb_ref.idx'
+			&& ln -s '${refTranscriptSource.h_index.t2g_file}' './index/t2g.txt'
+			#if $workflow == "lamanno":
+				&& ln -s '${refTranscriptSource.h_index.cdna_t2c}' './index/cdna_t2c.txt'
+				&& ln -s '${refTranscriptSource.h_index.intron_t2c}' './index/intron_t2c.txt'
+			#end if
+			#set $index_path = './index'
+		#else:
             #set $index_path = $refTranscriptSource.index.fields.path
         #end if
 		&& kb count
 		-i $index_path/kb_ref.idx 
-		-g $index_path/t2g.txt 
-		-x \${GALAXY_SLOTS:-2} 
+		-g $index_path/t2g.txt
+		-x $technology
+		-t \${GALAXY_SLOTS:-2}
         #if $whitelist:
             --whitelist '${optional.whitelist}'
         #end if
-		#if '${optional.whitelist}':
+		#if $optional.multimap:
 			--mm
 		#end if
 		--workflow $workflow
-		#if '${optional.extra_dtype}' == "loom":
-			--loom
-		#elif '${optional.extra_dtype}' == "h5ad":
-			--h5ad
+		#if $extra_dtype != "none":
+			$extra_dtype
 		#end if
 		-t \${GALAXY_SLOTS:-2}
 		-m \$GALAXY_MEMORY_MB
 		-o ./kb_outs 
 		--cellranger 
-		$FASTQ1 
+		$FASTQ1
 		$FASTQ2
 		]]>
 	</command>
@@ -78,15 +72,15 @@
 		</param>
 		<param name="FASTQ1" label="Select the R1 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>
 		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/> 
+		<param name="extra_dtype" type="select" label="Do you want any additional output data type beside CellRanger?">
+			<option value="none" selected = "true">No</option>
+			<option value="loom">Loom</option>
+			<option value="h5ad">H5ad</option>
+		</param>
 		<section name="optional" title="Optional commands" expanded="false">
 			<param name="whitelist" type="data" format="tsv,tabular" optional="true" label="Whitelist file" help="Whitelisted barcodes to correct to. If not provided and bustools supports the technology, a pre-packaged whitelist is used. If not, the bustools
 			whitelist command is used."/>
 			<param name="multimap" type="boolean" optional="true" label="Include multi pseudoaligned reads?" help="Do you want to include reads that pseudoalign to multiple genes?"/>
-			<param name="extra_dtype" type="select" label="Do you want any additional output data type beside CellRanger?">
-				<option value="none" selected="true">None</option>
-				<option value="loom">Loom</option>
-				<option value="h5ad">H5ad</option>
-			</param>
 		</section>
 	</inputs>
     <outputs>
@@ -96,28 +90,31 @@
 		<data name="inspect" label="inspect_report" format="json" from_work_dir="kb_outs/inspect.json"/>
 		<data name="runinfo" label="run info" format="json" from_work_dir="kb_outs/run_info.json"/>
 		<data name="kbinfo" label="kb info" format="json" from_work_dir="kb_outs/kb_info.json"/>
-		<data name="kb_ref.idx" label="kb_ref.idx" from_work_dir="index/kb_ref.idx">
-            <filter>reuse_index is True</filter>
+		<data name="kb_ref" label="kb_ref.idx" format="kallisto.idx" from_work_dir="index/kb_ref.idx">
+            <filter>refTranscriptSource['TranscriptSource'] == "built" and refTranscriptSource['reuse_index']</filter>
 		</data>
-		<data name="cdna_t2c.txt" label="-c1 cdna_t2c.txt" from_work_dir="index/cdna_t2c.txt">
+		<data name="cdna_t2c" label="-c1 cdna_t2c.txt" format="txt" from_work_dir="index/cdna_t2c.txt">
 			<filter>workflow == "lamanno"</filter>
-			<filter>reuse_index is True</filter>
+			<filter>refTranscriptSource['reuse_index'] is True</filter>
 		</data>
-		<data name="intron_t2c.txt" label="-c2 intron_t2c.txt" from_work_dir="index/intron_t2c.txt">
+		<data name="intron_t2c" label="-c2 intron_t2c.txt" format="txt" from_work_dir="index/intron_t2c.txt">
 			<filter>workflow == "lamanno"</filter>
-			<filter>reuse_index is True</filter>
+			<filter>refTranscriptSource['reuse_index'] is True</filter>
+		</data>	
+		<data name="adata" label="adata.h5ad" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.h5ad">
+			<filter	>extra_dtype == "h5ad"</filter>
 		</data>
-		<data name="intron_t2c.txt" label="-c2 intron_t2c.txt" from_work_dir="index/intron_t2c.txt">
-			<filter>workflow == "lamanno"</filter>
-			<filter>reuse_index is True</filter>
-		</data>
-		<data name="adata.h5ad" label="adata.h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.h5ad">
-			<filter>optional["extra_dtype"] == "h5ad"</filter>
-		</data>
-		<data name="adata.loom" label="adata.loom" from_work_dir="kb_outs/counts_unfiltered/adata.loom">
-			<filter>optional["extra_dtype"] == "loom"</filter>
+		<data name="adata" label="adata.loom" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.loom">
+			<filter>extra_dtype == "loom"</filter>
 		</data>
 	</outputs>
+	<!-- <test>
+		<test expect_num_outputs="">
+			<conditional name="refTranscriptSource">
+                <param name="TranscriptSource" value="history"/>
+                <param name="genomic_fasta" value="mini_genome.fa.gz"/>
+				<param name="genomic_gtf" value="mini_gtf.fa.gz"/>
+	</test> -->
 	<help><![CDATA[
 		This is a galaxy wrapper for kallisto-bustools (kb) for quantification of different types of single-cell sequencing data. The main kallisto-bustools homepage can be found under: 
 		'kallisto-bustools<https://www.kallistobus.tools/>'.

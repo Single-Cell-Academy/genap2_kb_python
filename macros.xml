@@ -13,21 +13,29 @@
     </xml>
     <xml name="index">
         <conditional name="refTranscriptSource">
-            <param name="TranscriptSource" type="select" label="Select a reference transcriptome from your history or use a built-in index?"
-                help="Pre-built-indices were downloaded on March 17th 2021">
+            <param name="TranscriptSource" type="select" label="Select a reference transcriptome from your history or use a built-in index?">
                 <option value="indexed">Use a built-in index</option>
-                <option value="history" selected="True">Use one from the history</option>
+                <option value="history">Use one from the history</option>
+                <option value="built" selected="True">Built one </option>
             </param>
             <when value="indexed">
-                <param name="index" type="select" label="Select a reference index" help="If your species of interest is not listed, contact your Galaxy admin">
+                <param name="index" type="select" label="Select a reference index" help="Pre-built-indices were downloaded on March 17th 2021.If your species of interest is not listed, contact your Galaxy admin.">
                     <options from_data_table="kallisto_indexes_versioned"/>
                 </param>
             </when>  <!-- build-in -->
             <when value="history">
+                <section name="h_index" title="Use index from history" expanded="true">
+                    <param name="index_file" type="data" format="kallisto.idx" label="kb index file (.idx)"/>
+                    <param name="t2g_file" type="data" format="tabular" label="Transcript to gene (t2g) file"/>
+                    <param name="cdna_t2c" optional="true" type="data" format="txt" label="-c1 cDNA transcripts-to-captures (t2c) file (only needed with for RNA velocity with lamanno)"/>
+                    <param name="intron_t2c" optional="true" type="data" format="txt" label="-c2 intron transcripts-to-captures (t2c) file (only needed for RNA velocity with lamanno)"/>
+                </section>
+            </when>
+            <when value="built">
                 <section name="s_index" title="Kallisto index" expanded="true">
                     <param name="genomic_fasta" type="data" format="fasta" label="Genomic fasta file"/>
                     <param name="genomic_gtf" type="data" format="gtf" label="Genomic gtf file"/>
-                    <param name="reuse_index" type="boolean" label="Do you want to keep the index in your history for reuse?" truevalue="Yes" falsevalue="No" checked="false" help="If not selected, the index created by kb will not
+                    <param name="reuse_index" label="Do you want to keep the index in your history for reuse?"  type="boolean" truevalue="true" falsevalue="false" checked="False"  help="If not selected, the index created by kb will not
                     be retrieved by galaxy and you willhave to recompute it next time!"/>
                 </section>
             </when>
