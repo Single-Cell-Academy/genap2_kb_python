@@ -44,8 +44,6 @@
 		-i $index_path/kb_ref.idx 
 		-g $index_path/t2g.txt
 		-x $technology
-		-t \${GALAXY_SLOTS:-2}
-		-m \$GALAXY_MEMORY_MB
         #if $whitelist:
             --whitelist '${optional.whitelist}'
         #end if
@@ -120,13 +118,25 @@
 			<filter>extra_dtype == "loom"</filter>
 		</data>
 	</outputs>
-	<!-- <test>
-		<test expect_num_outputs="">
+	<tests>
+		<test>
 			<conditional name="refTranscriptSource">
                 <param name="TranscriptSource" value="history"/>
-                <param name="genomic_fasta" value="mini_genome.fa.gz"/>
-				<param name="genomic_gtf" value="mini_gtf.fa.gz"/>
-	</test> -->
+                <section name="h_index">
+                    <param name="index_file" value="GRCm39.gencode.chr19_sub.kb_ref.idx"/>
+					<param name="t2g_file" value="GRCm39.gencode.chr19_sub.t2g.txt"/>
+                </section>
+            </conditional>
+			<param name="technology" value="10XV2"/>
+			<param name="workflow" value="standard"/>
+			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
+			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.tsv" ftype="tsv"/>
+			<output name="genes" file="genes.tsv" ftype="tsv"/>
+			<output name="matrix" file="matrix.mtx" ftype="mtx"/>
+		</test>
+	</tests>
 	<help><![CDATA[
 		This is a galaxy wrapper for kallisto-bustools (kb) for quantification of different types of single-cell sequencing data. The main kallisto-bustools homepage can be found under: 
 		'kallisto-bustools<https://www.kallistobus.tools/>'.
