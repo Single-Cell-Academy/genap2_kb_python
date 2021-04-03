@@ -24,6 +24,19 @@
 				&& ln -s '${refTranscriptSource.h_index.intron_t2c}' './index/intron_t2c.txt'
 			#end if
 			#set $index_path = './index'
+		#else if $refTranscriptSource.TranscriptSource == "built":
+			&& kb ref -i ./index/kb_ref.idx
+				-g ./index/t2g.txt
+				-f1 ./index/cdna.fa	
+				#if $workflow == "lamanno":
+					-f2 ./index/intron.fa
+					-c1 ./index/cdna_t2c.txt
+					-c2 ./index/intron_t2c.txt
+					--workflow $workflow
+				#end if
+				'${refTranscriptSource.s_index.genomic_fasta}'
+				'${refTranscriptSource.s_index.genomic_gtf}'
+				#set $index_path = './index'
 		#else:
             #set $index_path = $refTranscriptSource.index.fields.path
         #end if
@@ -32,6 +45,7 @@
 		-g $index_path/t2g.txt
 		-x $technology
 		-t \${GALAXY_SLOTS:-2}
+		-m \$GALAXY_MEMORY_MB
         #if $whitelist:
             --whitelist '${optional.whitelist}'
         #end if
@@ -42,8 +56,6 @@
 		#if $extra_dtype != "none":
 			$extra_dtype
 		#end if
-		-t \${GALAXY_SLOTS:-2}
-		-m \$GALAXY_MEMORY_MB
 		-o ./kb_outs 
 		--cellranger 
 		$FASTQ1
