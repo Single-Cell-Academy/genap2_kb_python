@@ -132,9 +132,9 @@
 			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
 			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.tsv" ftype="tsv"/>
-			<output name="genes" file="genes.tsv" ftype="tsv"/>
-			<output name="matrix" file="matrix.mtx" ftype="mtx"/>
+			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
 		</test>
 	</tests>
 	<help><![CDATA[
