@@ -1,0 +1,5 @@
+categories: ["Sequence Analysis","RNA","Transcriptomics"]
+description: kb_python erforms gene and feature quantification on single-cell sequencing
+  data.
+name: kb_python
+owner: flowuenne@gmail.com
