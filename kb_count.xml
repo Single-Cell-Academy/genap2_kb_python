@@ -1,4 +1,4 @@
-<tool id="kb-python" name="kb-python" version="0.25.1">
+<tool id="kb_python" name="kb_python" version="@VERSION@+galaxy0">
 	<description>performs gene and feature quantification on single-cell sequencing data.</description>
 	<macros>
         	<import>macros.xml</import>
@@ -19,23 +19,28 @@
 		#if $refTranscriptSource.TranscriptSource == "history":
 			&& ln -s '${refTranscriptSource.h_index.index_file}' './index/kb_ref.idx'
 			&& ln -s '${refTranscriptSource.h_index.t2g_file}' './index/t2g.txt'
-			#if $workflow == "lamanno":
-				&& ln -s '${refTranscriptSource.h_index.cdna_t2c}' './index/cdna_t2c.txt'
-				&& ln -s '${refTranscriptSource.h_index.intron_t2c}' './index/intron_t2c.txt'
+			#if $workflow == "lamanno" or $workflow == "nucleus":
+				&& ln -s '${refTranscriptSource.h_index.history_lamanno.cdna_t2c}' './index/cdna_t2c.txt'
+				&& ln -s '${refTranscriptSource.h_index.history_lamanno.intron_t2c}' './index/intron_t2c.txt'
 			#end if
 			#set $index_path = './index'
 		#else if $refTranscriptSource.TranscriptSource == "built":
 			&& kb ref -i ./index/kb_ref.idx
 				-g ./index/t2g.txt
 				-f1 ./index/cdna.fa	
-				#if $workflow == "lamanno":
+				--workflow $workflow
+				#if $workflow == "lamanno" or $workflow == "nucleus":
 					-f2 ./index/intron.fa
 					-c1 ./index/cdna_t2c.txt
 					-c2 ./index/intron_t2c.txt
 					--workflow $workflow
 				#end if
-				'${refTranscriptSource.s_index.genomic_fasta}'
-				'${refTranscriptSource.s_index.genomic_gtf}'
+				#if $workflow != "kite":
+					'${refTranscriptSource.s_index.genomic_fasta}'
+					'${refTranscriptSource.s_index.genomic_gtf}'
+				#else:
+					'${refTranscriptSource.s_index.kite_table}'
+				#end if
 				#set $index_path = './index'
 		#else:
             #set $index_path = $refTranscriptSource.index.fields.path
@@ -43,6 +48,10 @@
 		&& kb count
 		-i $index_path/kb_ref.idx 
 		-g $index_path/t2g.txt
+		#if $workflow == "lamanno" or  $workflow == "nucleus":
+			-c1 $index_path/cdna_t2c.txt
+			-c2 $index_path/intron_t2c.txt
+		#end if
 		-x $technology
         #if $whitelist:
             --whitelist '${optional.whitelist}'
@@ -61,6 +70,13 @@
 		]]>
 	</command>
 	<inputs>
+		<param name="workflow" label="Select the workflow you want to use:" type="select" multiple="false" format="text" help="Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic.
+		Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite:10xFB` for 10x Genomics Feature Barcoding technology.">
+			<option value="standard">standard</option>
+			<option value="lamanno">lamanno</option>
+			<option value="nucleus">nucleus</option>
+			<option value="kite">kite</option>
+		</param>
 		<expand macro="index"/>
 		<param name="technology" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
 			<option value="10XV1">10XV1</option>
@@ -74,11 +90,6 @@
 			<option value="INDROPSV3">INDROPSV3</option>
 			<option value="SCRUBSEQ">SCRUBSEQ</option>
 			<option value="SURECELL">SURECELL</option>
-		</param>
-		<param name="workflow" label="Select the workflow you want to use:" type="select" multiple="false" format="text" help="Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic.
-		Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite:10xFB` for 10x Genomics Feature Barcoding technology.">
-			<option value="standard">standard</option>
-			<option value="lamanno">lamanno</option>
 		</param>
 		<param name="FASTQ1" label="Select the R1 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>
 		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/> 
@@ -105,10 +116,12 @@
 		</data>
 		<data name="cdna_t2c" label="-c1 cdna_t2c.txt" format="txt" from_work_dir="index/cdna_t2c.txt">
 			<filter>workflow == "lamanno"</filter>
+			<filter>refTranscriptSource['TranscriptSource'] == "built"</filter> 
 			<filter>refTranscriptSource['reuse_index'] is True</filter>
 		</data>
 		<data name="intron_t2c" label="-c2 intron_t2c.txt" format="txt" from_work_dir="index/intron_t2c.txt">
 			<filter>workflow == "lamanno"</filter>
+			<filter>refTranscriptSource['TranscriptSource'] == "built"</filter> 
 			<filter>refTranscriptSource['reuse_index'] is True</filter>
 		</data>	
 		<data name="adata" label="adata.h5ad" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.h5ad">
@@ -119,23 +132,7 @@
 		</data>
 	</outputs>
 	<tests>
-		<test>
-			<conditional name="refTranscriptSource">
-                <param name="TranscriptSource" value="history"/>
-                <section name="h_index">
-                    <param name="index_file" value="GRCm39.gencode.chr19_sub.kb_ref.idx"/>
-					<param name="t2g_file" value="GRCm39.gencode.chr19_sub.t2g.txt"/>
-                </section>
-            </conditional>
-			<param name="technology" value="10XV2"/>
-			<param name="workflow" value="standard"/>
-			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
-			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
-			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
-		</test>
+		<expand macro="tests"/>
 	</tests>
 	<help><![CDATA[
 		This is a galaxy wrapper for kallisto-bustools (kb) for quantification of different types of single-cell sequencing data. The main kallisto-bustools homepage can be found under: 
