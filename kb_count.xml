@@ -1,8 +1,8 @@
-<tool id="kb-python" name="kb-python" version="0.25.1">
-	<description> The kb count command runs the kallisto and bustools programs. It can be used for pre-processing of data from a variety of single-cell RNA-seq technologies, and for a number of different workflows (e.g. production of gene count matrices, RNA velocity analyses, etc.).</description>
+<tool id="kb_python" name="kb_python" version="@VERSION@+galaxy0">
+	<description>performs gene and feature quantification on single-cell sequencing data.</description>
 	<macros>
         	<import>macros.xml</import>
-    	</macros>
+    </macros>
 	<requirements>
 		<requirement type="package" version="0.25.1">kb-python</requirement>
 	</requirements>
@@ -13,18 +13,72 @@
 		<regex match="Exception:" />
 		<regex match="Exception :" />
 	</stdio>
-	<command detect_errors="exit_code">
-		<![CDATA[
-		mkdir ./kb_outs
-		&&
-		kb count -i /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/index.idx -g /cvmfs/soft.galaxy/v2.1/server/tools/single_cell_tools/refs/kb_python/Index/Mouse/t2g.txt -x $TECHNOLOGY -o ./kb_outs --h5ad --cellranger $FASTQ1 $FASTQ2
+	<command detect_errors="exit_code"><![CDATA[
+		mkdir ./index
+		&& mkdir ./kb_outs
+		#if $refTranscriptSource.TranscriptSource == "history":
+			&& ln -s '${refTranscriptSource.h_index.index_file}' './index/kb_ref.idx'
+			&& ln -s '${refTranscriptSource.h_index.t2g_file}' './index/t2g.txt'
+			#if $workflow == "lamanno" or $workflow == "nucleus":
+				&& ln -s '${refTranscriptSource.h_index.history_lamanno.cdna_t2c}' './index/cdna_t2c.txt'
+				&& ln -s '${refTranscriptSource.h_index.history_lamanno.intron_t2c}' './index/intron_t2c.txt'
+			#end if
+			#set $index_path = './index'
+		#else if $refTranscriptSource.TranscriptSource == "built":
+			&& kb ref -i ./index/kb_ref.idx
+				-g ./index/t2g.txt
+				-f1 ./index/cdna.fa	
+				--workflow $workflow
+				#if $workflow == "lamanno" or $workflow == "nucleus":
+					-f2 ./index/intron.fa
+					-c1 ./index/cdna_t2c.txt
+					-c2 ./index/intron_t2c.txt
+					--workflow $workflow
+				#end if
+				#if $workflow != "kite":
+					'${refTranscriptSource.s_index.genomic_fasta}'
+					'${refTranscriptSource.s_index.genomic_gtf}'
+				#else:
+					'${refTranscriptSource.s_index.kite_table}'
+				#end if
+				#set $index_path = './index'
+		#else:
+            #set $index_path = $refTranscriptSource.index.fields.path
+        #end if
+		&& kb count
+		-i $index_path/kb_ref.idx 
+		-g $index_path/t2g.txt
+		#if $workflow == "lamanno" or  $workflow == "nucleus":
+			-c1 $index_path/cdna_t2c.txt
+			-c2 $index_path/intron_t2c.txt
+		#end if
+		-x $technology
+        #if $whitelist:
+            --whitelist '${optional.whitelist}'
+        #end if
+		#if $optional.multimap:
+			--mm
+		#end if
+		--workflow $workflow
+		#if $extra_dtype != "none":
+			$extra_dtype
+		#end if
+		-o ./kb_outs 
+		--cellranger 
+		$FASTQ1
+		$FASTQ2
 		]]>
 	</command>
 	<inputs>
-		<!-- <expand macro="reference_input" />
-		<param type="data" name="INDEX" label="Kallisto index" format="idx" multiple="false"/>
-		<param type="data" name="T2G" label="Transcript-to-gene mapping"  format="txt" multiple="false" /> -->
-		<param name="TECHNOLOGY" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
+		<param name="workflow" label="Select the workflow you want to use:" type="select" multiple="false" format="text" help="Type of workflow. Use `lamanno` for RNA velocity based on La Manno et al. 2018 logic.
+		Use `nucleus` for RNA velocity on single-nucleus RNA-seq reads. Use `kite` for feature barcoding. Use `kite:10xFB` for 10x Genomics Feature Barcoding technology.">
+			<option value="standard">standard</option>
+			<option value="lamanno">lamanno</option>
+			<option value="nucleus">nucleus</option>
+			<option value="kite">kite</option>
+		</param>
+		<expand macro="index"/>
+		<param name="technology" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
 			<option value="10XV1">10XV1</option>
 			<option value="10XV2">10XV2</option>
 			<option value="10XV3">10XV3</option>
@@ -38,16 +92,58 @@
 			<option value="SURECELL">SURECELL</option>
 		</param>
 		<param name="FASTQ1" label="Select the R1 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>
-		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/>  
+		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/> 
+		<param name="extra_dtype" type="select" label="Do you want any additional output data type beside CellRanger?">
+			<option value="none" selected = "true">No</option>
+			<option value="loom">Loom</option>
+			<option value="h5ad">H5ad</option>
+		</param>
+		<section name="optional" title="Optional commands" expanded="false">
+			<param name="whitelist" type="data" format="tsv,tabular" optional="true" label="Whitelist file" help="Whitelisted barcodes to correct to. If not provided and bustools supports the technology, a pre-packaged whitelist is used. If not, the bustools
+			whitelist command is used."/>
+			<param name="multimap" type="boolean" optional="true" label="Include multi pseudoaligned reads?" help="Do you want to include reads that pseudoalign to multiple genes?"/>
+		</section>
 	</inputs>
-        <outputs>
-		<data name="h5ad" label="kb-python h5ad file" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata.h5ad"/>
-		<data name="h5ad_genenames" label="kb-python h5ad file filtered for unique gene names" format="h5" from_work_dir="./kb_outs/counts_unfiltered/adata_genenames.h5ad"/>
-		<data name="barcodes" label="cellranger barcodes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/barcodes.tsv"/>
-		<data name="genes" label="cellranger genes" format="tabular" from_work_dir="./kb_outs/counts_unfiltered/cellranger/genes.tsv"/>
-		<data name="matrix" label="cellranger matrix" format="txt" from_work_dir="./kb_outs/counts_unfiltered/cellranger/matrix.mtx" />
-		<data name="inspect" label="inspect_report" format="json" from_work_dir="./kb_outs/inspect.json"/>
-		<data name="runinfo" label="run info" format="json" from_work_dir="./kb_outs/run_info.json"/>
-		<data name="kbinfo" label="kb info" format="json" form_work_dir="./kb_outs/kb_info.json"/>
-        </outputs>
+    <outputs>
+		<data name="barcodes" label="cellranger barcodes" format="tabular" from_work_dir="kb_outs/counts_unfiltered/cellranger/barcodes.tsv"/>
+		<data name="genes" label="cellranger genes" format="tabular" from_work_dir="kb_outs/counts_unfiltered/cellranger/genes.tsv"/>
+		<data name="matrix" label="cellranger matrix" format="txt" from_work_dir="kb_outs/counts_unfiltered/cellranger/matrix.mtx" />
+		<data name="inspect" label="inspect_report" format="json" from_work_dir="kb_outs/inspect.json"/>
+		<data name="runinfo" label="run info" format="json" from_work_dir="kb_outs/run_info.json"/>
+		<data name="kbinfo" label="kb info" format="json" from_work_dir="kb_outs/kb_info.json"/>
+		<data name="kb_ref" label="kb_ref.idx" format="kallisto.idx" from_work_dir="index/kb_ref.idx">
+            <filter>refTranscriptSource['TranscriptSource'] == "built" and refTranscriptSource['reuse_index']</filter>
+		</data>
+		<data name="cdna_t2c" label="-c1 cdna_t2c.txt" format="txt" from_work_dir="index/cdna_t2c.txt">
+			<filter>workflow == "lamanno"</filter>
+			<filter>refTranscriptSource['TranscriptSource'] == "built"</filter> 
+			<filter>refTranscriptSource['reuse_index'] is True</filter>
+		</data>
+		<data name="intron_t2c" label="-c2 intron_t2c.txt" format="txt" from_work_dir="index/intron_t2c.txt">
+			<filter>workflow == "lamanno"</filter>
+			<filter>refTranscriptSource['TranscriptSource'] == "built"</filter> 
+			<filter>refTranscriptSource['reuse_index'] is True</filter>
+		</data>	
+		<data name="adata" label="adata.h5ad" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.h5ad">
+			<filter	>extra_dtype == "h5ad"</filter>
+		</data>
+		<data name="adata" label="adata.loom" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.loom">
+			<filter>extra_dtype == "loom"</filter>
+		</data>
+	</outputs>
+	<tests>
+		<expand macro="tests"/>
+	</tests>
+	<help><![CDATA[
+		This is a galaxy wrapper for kallisto-bustools (kb) for quantification of different types of single-cell sequencing data. The main kallisto-bustools homepage can be found under: 
+		'kallisto-bustools<https://www.kallistobus.tools/>'.
+
+		The kb count command runs the kallisto and bustools programs. It can be used for pre-processing of data from a variety of single-cell RNA-seq technologies, 
+		and for a number of different workflows (e.g. production of gene count matrices, RNA velocity analyses, etc.).
+  
+		The kb package is developed and maintained by the Pachterlab under the MIT License.
+	  ]]></help>
+	<citations>
+        <citation type="doi">https://doi.org/10.1101/673285</citation>
+    </citations>
 </tool>

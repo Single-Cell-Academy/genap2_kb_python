@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <macros>
-    <token name="@VERSION@">0.25.1</token>
+    <token name="@VERSION@">0.1.0</token>
+    <token name="@IDX_VERSION@">q1</token>
     <xml name="requirements">
         <requirements>
             <requirement type="package" version="@VERSION@">kb-python</requirement>
@@ -11,23 +12,154 @@
             <citation type="doi">add citation</citation>
         </citations>
     </xml>
-    <xml name="reference_input">
-        <conditional name="reference_transcriptome">
-            <param name="reference_transcriptome_source" type="select" label="Reference transcriptome for quantification">
-                <option value="indexed" selected="true">Use a built-in transcriptome</option>
-                <option value="history">Use a transcriptome from history</option>
+    <xml name="index">
+        <conditional name="refTranscriptSource">
+            <param name="TranscriptSource" type="select" label="Select a reference transcriptome from your history or use a built-in index?">
+                <option value="indexed">Use a provided index</option>
+                <option value="history">Use an index from your history</option>
+                <option value="built" selected="True">Built one </option>
             </param>
             <when value="indexed">
-                <param name="index" type="select" label="Select a reference transcriptome" help="If your transcriptome of interest is not listed, contact your Galaxy administrator">
-                    <options from_data_table="kb_indexes">
-                        <filter type="sort_by" column="2" />
-                        <validator type="no_options" message="No transcriptomes are available for the selected input dataset" />
+                <param name="index" type="select" label="Select a reference index" help="Pre-built-indices were downloaded on March 17th 2021.If your species of interest is not listed, contact your Galaxy admin.">
+                    <options from_data_table="kallisto_indexes_versioned">
+                        <filter type="sort_by" column="2"/>
+                        <filter type="static_value" column="4" value="@IDX_VERSION@" />
+                        <validator type="no_options" message="No indexes are available for the selected input dataset"/>
                     </options>
                 </param>
-            </when>
+            </when>  <!-- build-in -->
             <when value="history">
-                <param name="reference" type="data" format="fasta" label="FASTA reference transcriptome" />
+                <section name="h_index" title="Select the index files from your history:" expanded="true">
+                    <param name="index_file" type="data" format="kallisto.idx" label="kb index file (.idx)"/>
+                    <param name="t2g_file" type="data" format="tabular" label="Transcript to gene (t2g) file"/>
+                    <section name="history_lamanno" title="Lamanno index files" expanded="false">
+                        <param name="cdna_t2c" optional="true" type="data" format="txt" label="-c1 cDNA transcripts-to-captures (t2c) file (only needed for RNA velocity with workflow==lamanno)"/>
+                        <param name="intron_t2c" optional="true" type="data" format="txt" label="-c2 intron transcripts-to-captures (t2c) file (only for RNA velocity with workflow==lamanno)"/>
+                    </section>
+                </section>
+            </when>
+            <when value="built">
+                <section name="s_index" title="Kb index" expanded="true">
+                    <param name="genomic_fasta" type="data" optional="true" format="fasta" label="Genomic fasta file"/>
+                    <param name="genomic_gtf" type="data" optional="true" format="gtf" label="Genomic gtf file"/>
+                    <param name="kite_table" type="data" label="Kite table of feature barcodes and IDs" optional="true" format="tabular"/>
+                    <param name="reuse_index" label="Do you want to keep the index in your history for reuse?"  type="boolean" truevalue="true" falsevalue="false" checked="false"  help="If not selected, the index created by kb will not
+                    be retrieved by galaxy and you willhave to recompute it next time!"/>
+                </section>
             </when>
         </conditional>
+    </xml>
+    <xml name="tests">
+    		<!-- Test1: Test with pre-built index provided by user -->
+		<test>
+			<conditional name="refTranscriptSource">
+                <param name="TranscriptSource" value="history"/>
+                <section name="h_index">
+                    <param name="index_file" value="GRCm39.gencode.chr19_sub.kb_ref.idx"/>
+					<param name="t2g_file" value="GRCm39.gencode.chr19_sub.t2g.txt"/>
+                </section>
+            </conditional>
+			<param name="technology" value="10XV2"/>
+			<param name="workflow" value="standard"/>
+			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
+			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
+		<!--Test2: Test with building the index on the fly, before kb count.-->
+		<test>
+			<conditional name="refTranscriptSource">
+				<param name="TranscriptSource" value="built"/>
+				<section name="s_index">
+					<param name="genomic_fasta" value="GRCm39.chr19_100k.fa.gz"/>
+					<param name="genomic_gtf" value="gencode.VM26.chr19_10k.gtf.gz"/>
+				</section>
+			</conditional>
+			<param name="technology" value="10XV2"/>
+			<param name="workflow" value="standard"/>
+			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
+			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
+		<!--Test3: Test lamanno workflow with pre-built index.-->	
+		<test>
+			<conditional name="refTranscriptSource">
+                <param name="TranscriptSource" value="history"/>
+                <section name="h_index">
+                    <param name="index_file" value="kb_ref.lamanno.idx"/>
+					<param name="t2g_file" value="t2g.lamanno.txt"/>
+					<section name="history_lamanno">
+						<param name="cdna_t2c" value="cdna_t2c.lamanno.txt"/>
+						<param name="intron_t2c" value="intron_t2c.lamanno.txt"/>
+					</section>
+                </section>
+            </conditional>
+			<param name="technology" value="10XV2"/>
+			<param name="workflow" value="lamanno"/>
+			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
+			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
+		<!--Test:4 Test lamanno workflow with building the index on the fly, before kb count.-->	
+		<test>
+			<conditional name="refTranscriptSource">
+				<param name="TranscriptSource" value="built"/>
+					<section name="s_index">
+						<param name="genomic_fasta" value="GRCm39.chr19_100k.fa.gz"/>
+						<param name="genomic_gtf" value="gencode.VM26.chr19_10k.gtf.gz"/>
+					</section>
+			</conditional>
+			<param name="technology" value="10XV2"/>
+			<param name="workflow" value="lamanno"/>
+			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
+			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
+        <!--Test:5 Test kite workflow with pre-built index.-->	
+		<test>
+			<conditional name="refTranscriptSource">
+				<param name="TranscriptSource" value="history"/>
+                    <section name="h_index">
+                        <param name="index_file" value="mismatch.idx"/>
+                        <param name="t2g_file" value="t2g.kite.txt"/>
+					</section>
+			</conditional>
+			<param name="technology" value="10XV3"/>
+			<param name="workflow" value="kite"/>
+			<param name="FASTQ1" value="pbmc_1k_protein_v3_antibody_S2_L001_R1_001.100k_sub.fastq.gz"/>
+			<param name="FASTQ2" value="pbmc_1k_protein_v3_antibody_S2_L001_R2_001.100k_sub.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
+        <!--Test:6 Test kite workflow with building the index on the fly, before kb count.-->	
+		<test>
+			<conditional name="refTranscriptSource">
+				<param name="TranscriptSource" value="built"/>
+					<section name="s_index">
+						<param name="kite_table" value="kite_features.tsv"/>
+					</section>
+			</conditional>
+			<param name="technology" value="10XV3"/>
+			<param name="workflow" value="kite"/>
+			<param name="FASTQ1" value="pbmc_1k_protein_v3_antibody_S2_L001_R1_001.100k_sub.fastq.gz"/>
+			<param name="FASTQ2" value="pbmc_1k_protein_v3_antibody_S2_L001_R2_001.100k_sub.fastq.gz"/>
+			<param name="extra_dtype" value="none"/>
+			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
+			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
+			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+		</test>
     </xml>
 </macros>

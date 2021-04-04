@@ -1,0 +1,6 @@
+<tables>
+    <table name="kallisto_indexes_versioned" comment_char="#">
+        <columns>value, dbkey, name, path</columns>
+        <file path="tool-data/kallisto_indexes_versioned.loc"/>
+    </table>
+</tables>
