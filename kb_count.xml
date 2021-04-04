@@ -43,7 +43,7 @@
 				#end if
 				#set $index_path = './index'
 		#else:
-            #set $index_path = $refTranscriptSource.index.fields.path
+            #set $index_path = $refTranscriptSource.p_index.fields.path
         #end if
 		&& kb count
 		-i $index_path/kb_ref.idx 

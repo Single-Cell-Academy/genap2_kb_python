@@ -20,7 +20,7 @@
                 <option value="built" selected="True">Built one </option>
             </param>
             <when value="indexed">
-                <param name="index" type="select" label="Select a reference index" help="Pre-built-indices were downloaded on March 17th 2021.If your species of interest is not listed, contact your Galaxy admin.">
+                <param name="p_index" type="select" label="Select a reference index" help="Pre-built-indices were downloaded on March 17th 2021.If your species of interest is not listed, contact your Galaxy admin.">
                     <options from_data_table="kallisto_indexes_versioned">
                         <filter type="sort_by" column="2"/>
                         <filter type="static_value" column="4" value="@IDX_VERSION@" />
