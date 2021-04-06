@@ -123,10 +123,10 @@
 			<filter>refTranscriptSource['reuse_index'] is True</filter>
 		</data>	
 		<data name="adata" label="adata.h5ad" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.h5ad">
-			<filter	>extra_dtype == "h5ad"</filter>
+			<filter	>extra_dtype == "--h5ad"</filter>
 		</data>
-		<data name="adata" label="adata.loom" format="h5ad" from_work_dir="kb_outs/counts_unfiltered/adata.loom">
-			<filter>extra_dtype == "loom"</filter>
+		<data name="adata" label="adata.loom" format="loom" from_work_dir="kb_outs/counts_unfiltered/adata.loom">
+			<filter>extra_dtype == "--loom"</filter>
 		</data>
 	</outputs>
 	<tests>
