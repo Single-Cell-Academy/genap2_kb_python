@@ -15,19 +15,9 @@
     <xml name="index">
         <conditional name="refTranscriptSource">
             <param name="TranscriptSource" type="select" label="Select a reference transcriptome from your history or use a built-in index?">
-                <option value="indexed">Use a provided index</option>
                 <option value="history">Use an index from your history</option>
                 <option value="built" selected="True">Built one </option>
             </param>
-            <when value="indexed">
-                <param name="p_index" type="select" label="Select a reference index" help="Pre-built-indices were downloaded on March 17th 2021.If your species of interest is not listed, contact your Galaxy admin.">
-                    <options from_data_table="kallisto_indexes_versioned">
-                        <filter type="sort_by" column="2"/>
-                        <filter type="static_value" column="4" value="@IDX_VERSION@" />
-                        <validator type="no_options" message="No indexes are available for the selected input dataset"/>
-                    </options>
-                </param>
-            </when>  <!-- build-in -->
             <when value="history">
                 <section name="h_index" title="Select the index files from your history:" expanded="true">
                     <param name="index_file" type="data" format="kallisto.idx" label="kb index file (.idx)"/>
