@@ -93,8 +93,8 @@
 		<param name="FASTQ2" label="Select the R2 fastq file:" type="data" format="fastqsanger.gz" multiple="false"/> 
 		<param name="extra_dtype" type="select" label="Do you want any additional output data type beside CellRanger?">
 			<option value="none" selected = "true">No</option>
-			<option value="loom">Loom</option>
-			<option value="h5ad">H5ad</option>
+			<option value="--loom">Loom</option>
+			<option value="--h5ad">H5ad</option>
 		</param>
 		<section name="optional" title="Optional commands" expanded="false">
 			<param name="whitelist" type="data" format="tsv,tabular" optional="true" label="Whitelist file" help="Whitelisted barcodes to correct to. If not provided and bustools supports the technology, a pre-packaged whitelist is used. If not, the bustools
