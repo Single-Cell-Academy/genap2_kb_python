@@ -33,8 +33,6 @@
                     <param name="genomic_fasta" type="data" optional="true" format="fasta" label="Genomic fasta file"/>
                     <param name="genomic_gtf" type="data" optional="true" format="gtf" label="Genomic gtf file"/>
                     <param name="kite_table" type="data" label="Kite table of feature barcodes and IDs" optional="true" format="tabular"/>
-                    <param name="reuse_index" label="Do you want to keep the index in your history for reuse?"  type="boolean" truevalue="true" falsevalue="false" checked="false"  help="If not selected, the index created by kb will not
-                    be retrieved by galaxy and you willhave to recompute it next time!"/>
                 </section>
             </when>
         </conditional>
