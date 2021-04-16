@@ -22,17 +22,17 @@
                 <section name="h_index" title="Select the index files from your history:" expanded="true">
                     <param name="index_file" type="data" format="kallisto.idx" label="kb index file (.idx)"/>
                     <param name="t2g_file" type="data" format="tabular" label="Transcript to gene (t2g) file"/>
-                    <section name="history_lamanno" title="Lamanno index files" expanded="false">
-                        <param name="cdna_t2c" optional="true" type="data" format="txt" label="-c1 cDNA transcripts-to-captures (t2c) file (only needed for RNA velocity with workflow==lamanno)"/>
-                        <param name="intron_t2c" optional="true" type="data" format="txt" label="-c2 intron transcripts-to-captures (t2c) file (only for RNA velocity with workflow==lamanno)"/>
+                    <section name="history_lamanno" title="Additional index files" expanded="false">
+                        <param name="cdna_t2c" optional="true" type="data" format="txt" label="-c1 cDNA transcripts-to-captures (t2c) file (only needed with workflow==lamanno or nucleus)"/>
+                        <param name="intron_t2c" optional="true" type="data" format="txt" label="-c2 intron transcripts-to-captures (t2c) file (only needed with workflow==lamanno or nucleus)"/>
                     </section>
                 </section>
             </when>
             <when value="built">
                 <section name="s_index" title="Kb index" expanded="true">
-                    <param name="genomic_fasta" type="data" optional="true" format="fasta" label="Genomic fasta file"/>
-                    <param name="genomic_gtf" type="data" optional="true" format="gtf" label="Genomic gtf file"/>
-                    <param name="kite_table" type="data" label="Kite table of feature barcodes and IDs" optional="true" format="tabular"/>
+                    <param name="genomic_fasta" type="data" optional="true" format="fasta" label="Genomic fasta file (leave empty when: workflow = kite)"/>
+                    <param name="genomic_gtf" type="data" optional="true" format="gtf" label="Genomic gtf file (leave empty when: workflow = kite)"/>
+                    <param name="kite_table" type="data" label="Kite table of feature barcodes and IDs (only required when workflow = kite)" optional="true" format="tabular"/>
                 </section>
             </when>
         </conditional>
