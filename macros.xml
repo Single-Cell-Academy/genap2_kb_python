@@ -21,7 +21,7 @@
             <when value="history">
                 <section name="h_index" title="Select the index files from your history:" expanded="true">
                     <param name="index_file" type="data" format="kallisto.idx" label="kb index file (.idx)"/>
-                    <param name="t2g_file" type="data" format="tabular" label="Transcript to gene (t2g) file"/>
+                    <param name="t2g_file" type="data" format="txt" label="Transcript to gene (t2g) file"/>
                     <section name="history_lamanno" title="Additional index files" expanded="false">
                         <param name="cdna_t2c" optional="true" type="data" format="txt" label="-c1 cDNA transcripts-to-captures (t2c) file (only needed with workflow==lamanno or nucleus)"/>
                         <param name="intron_t2c" optional="true" type="data" format="txt" label="-c2 intron transcripts-to-captures (t2c) file (only needed with workflow==lamanno or nucleus)"/>
