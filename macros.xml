@@ -52,9 +52,9 @@
 			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
 			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
 		<!--Test2: Test with building the index on the fly, before kb count.-->
 		<test>
@@ -70,9 +70,9 @@
 			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
 			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
 		<!--Test3: Test lamanno workflow with pre-built index.-->	
 		<test>
@@ -92,9 +92,9 @@
 			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
 			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
 		<!--Test:4 Test lamanno workflow with building the index on the fly, before kb count.-->	
 		<test>
@@ -110,9 +110,9 @@
 			<param name="FASTQ1" value="SRR8599150_S1_L001_R1_001.100k_lines.fastq.gz"/>
 			<param name="FASTQ2" value="SRR8599150_S1_L001_R2_001.100k_lines.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.lamanno.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.lamanno.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.lamanno.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
         <!--Test:5 Test kite workflow with pre-built index.-->	
 		<test>
@@ -128,9 +128,9 @@
 			<param name="FASTQ1" value="pbmc_1k_protein_v3_antibody_S2_L001_R1_001.100k_sub.fastq.gz"/>
 			<param name="FASTQ2" value="pbmc_1k_protein_v3_antibody_S2_L001_R2_001.100k_sub.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
         <!--Test:6 Test kite workflow with building the index on the fly, before kb count.-->	
 		<test>
@@ -145,9 +145,9 @@
 			<param name="FASTQ1" value="pbmc_1k_protein_v3_antibody_S2_L001_R1_001.100k_sub.fastq.gz"/>
 			<param name="FASTQ2" value="pbmc_1k_protein_v3_antibody_S2_L001_R2_001.100k_sub.fastq.gz"/>
 			<param name="extra_dtype" value="none"/>
-			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="tabular"/>
-			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="tabular"/>
-			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="barcodes" file="barcodes.kite.tsv" compare="sim_size" delta="100000" ftype="txt"/>
+			<output name="genes" file="genes.kite.tsv" compare="sim_size" delta="100000"   ftype="txt"/>
+			<output name="matrix" file="matrix.kite.mtx" compare="sim_size" delta="100000" ftype="mtx"/>
 		</test>
     </xml>
 </macros>
