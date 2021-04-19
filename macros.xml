@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <macros>
-    <token name="@VERSION@">0.1.0</token>
-    <token name="@IDX_VERSION@">q1</token>
+    <token name="@VERSION@">0.26.0</token>
     <xml name="requirements">
         <requirements>
-            <requirement type="package" version="@VERSION@">kb-python</requirement>
+			<requirement type="package" version="@VERSION@"	>kb-python</requirement>
+			<requirement type="package" version="1.0.0">jupyter</requirement>
         </requirements>
     </xml>
     <xml name="citations">

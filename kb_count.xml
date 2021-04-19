@@ -1,12 +1,8 @@
-<tool id="kb_python" name="kb_python" version="@VERSION@+galaxy0">
+<tool id="kb_python" name="kb_python" version="@VERSION@+galaxy1">
 	<description>performs gene and feature quantification on single-cell sequencing data.</description>
 	<macros>
         	<import>macros.xml</import>
     </macros>
-	<requirements>
-		<requirement type="package" version="0.26.0">kb-python</requirement>
-		<requirement type="package" version="1.0.0">jupyter</requirement>
-	</requirements>
 	<stdio>
 		<exit_code range="1:" />
 		<exit_code range=":-1" />
