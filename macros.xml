@@ -38,7 +38,7 @@
         </conditional>
     </xml>
     <xml name="tests">
-    		<!-- Test1: Test with pre-built index provided by user -->
+    		<!-- Test1: Test with pre-built index provided by user and generating report -->
 		<test>
 			<conditional name="refTranscriptSource">
                 <param name="TranscriptSource" value="history"/>
