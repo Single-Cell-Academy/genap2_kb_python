@@ -1,8 +1,13 @@
 <tool id="kb_python" name="kb_python" version="@VERSION@+galaxy1">
 	<description>performs gene and feature quantification on single-cell sequencing data.</description>
 	<macros>
-        	<import>macros.xml</import>
-    </macros>
+		<import>macros.xml</import>
+	</macros>
+	<requirements>
+		<requirement type="package" version="@VERSION@"	>kb-python</requirement>
+		<requirement type="package" version="1.0.0">jupyter</requirement>
+	</requirements>
+
 	<stdio>
 		<exit_code range="1:" />
 		<exit_code range=":-1" />
@@ -32,7 +37,7 @@
 					-c2 ./index/intron_t2c.txt
 					--workflow $workflow
 				#end if
-				#if $workflow != "kite":
+				#if $workflow != "kite" and $workflow != "kite:10xFB":
 					'${refTranscriptSource.s_index.genomic_fasta}'
 					'${refTranscriptSource.s_index.genomic_gtf}'
 				#else:
@@ -71,6 +76,7 @@
 			<option value="lamanno">lamanno</option>
 			<option value="nucleus">nucleus</option>
 			<option value="kite">kite</option>
+			<option value="kite:10xFB">kite:10xFB (CITe-seq with Feature barcoding)</option>
 		</param>
 		<expand macro="index"/>
 		<param name="technology" label="Select the scRNA-seq technology:" type="select" multiple="false" format="text" help="Choose the scRNA-seq technology used to generate the fastq data.">
